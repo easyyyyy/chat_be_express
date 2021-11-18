@@ -4,6 +4,9 @@ var jwt = require('../dao/jwt')
 
 var dbmodel = require('../model/dbmodel')
 var User = dbmodel.model('User')
+var Friend = dbmodel.model('Friend')
+var Group = dbmodel.model('Group')
+var GroupMember = dbmodel.model('GroupMember')
 
 // 注册
 exports.addUser = (name, email, pwd, res) => {
@@ -94,6 +97,77 @@ exports.signInUser = (data, pwd, res) => {
           res.send({status: 200, data})
         }
       })
+    }
+  })
+}
+
+// 搜索用户
+exports.searchUser = (data, res) => {
+  let wherestr = {$or: [{ name: data }, { email: data }]}
+  let out = {
+    name: 1,
+    email: 1,
+    imgUrl: 1
+  }
+  User.find(wherestr, out, (err, result) => {
+    if(err) {
+      res.send({status: 500})
+    } else {
+      res.send({
+        status: 200,
+        result
+      })
+    }
+  })
+}
+
+// 判断是否为好友
+exports.isFriend = (uid, fid, res) => {
+  let wherestr = { uid, fid }
+  Friend.findOne(wherestr, (err, result) => {
+    if(err) {
+      res.send({status: 500})
+    } else {
+      if(result) {
+        res.send({status: 200})
+      } else {
+        res.send({status: 400})
+      }
+    }
+  })
+}
+
+// 搜索群
+exports.searchGroup = (data, res) => {
+  let wherestr = {$or: [{ name: data }]}
+  let out = {
+    name: 1,
+    imgUrl: 1
+  }
+  Group.find(wherestr, out, (err, result) => {
+    if(err) {
+      res.send({status: 500})
+    } else {
+      res.send({
+        status: 200,
+        result
+      })
+    }
+  })
+}
+
+// 判断是否在群里
+exports.isInGroup = (uid, gid, res) => {
+  let wherestr = { uid, gid }
+  GroupMember.findOne(wherestr, (err, result) => {
+    if(err) {
+      res.send({status: 500})
+    } else {
+      if(result) {
+        res.send({status: 200})
+      } else {
+        res.send({status: 400})
+      }
     }
   })
 }
