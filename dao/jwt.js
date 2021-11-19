@@ -13,7 +13,14 @@ exports.generateToken = (res) => {
 
 // 解码
 exports.verifyToken = (e) => {
-  let payload = jwt.verify(e, secret)
+  let payload;
+  jwt.verify(e, secret, (err, result) => {
+    if(err) {
+      payload = 0
+    } else {
+      payload = 1
+    }
+  })
 
   return payload
 }

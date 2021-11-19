@@ -19,8 +19,9 @@ const UserSchema = new Schema({
 const FriendSchema = new Schema({
   uid: { type: Schema.Types.ObjectId, ref:'User' },                         // 用户id
   fid: { type: Schema.Types.ObjectId, ref:'User' },                         // 好友id
-  state: { type: String },                          // 好友状态
+  state: { type: String },                          // 好友状态(0已经为好友，1申请中，2申请发送方)
   time: { type: Date },                          // 生成时间
+  lastTime: { type: Date }                        // 最后发送时间
 })
 
 // 一对一消息表

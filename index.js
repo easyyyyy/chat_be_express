@@ -1,8 +1,9 @@
 const express = require('express')
 var bodyParser = require('body-parser')
 var indexRouter = require('./router/index');
-var userRouter = require('./router/user')
-var searchRouter = require('./router/search')
+var userRouter = require('./router/userRouter')
+var searchRouter = require('./router/searchRouter')
+var friendRouter = require('./router/friendRouter')
 
 var jwt = require('./dao/jwt')
 const app = express()
@@ -31,6 +32,11 @@ app.use((req, res, next) => {
   if(typeof(req.body.token) != 'undefined') {
     let token = req.body.token
     let tokenMatch = jwt.verifyToken(token)
+    if(tokenMatch == 1) {
+      next()
+    } else {
+      res.send({status: 401, msg: '登录失效'})
+    }
   } else {
     next()
   }
@@ -40,6 +46,7 @@ app.use((req, res, next) => {
 app.use('/', indexRouter);
 app.use('/user', userRouter);
 app.use('/search', searchRouter);
+app.use('/friend', friendRouter);
 
 app.use((req, res, next) => {
   let err = new Error('Not Found')
