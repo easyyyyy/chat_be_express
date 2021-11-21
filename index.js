@@ -1,9 +1,13 @@
 const express = require('express')
+const cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
-var indexRouter = require('./router/index');
-var userRouter = require('./router/userRouter')
-var searchRouter = require('./router/searchRouter')
-var friendRouter = require('./router/friendRouter')
+// var indexRouter = require('./router/index');
+// var userRouter = require('./router/userRouter')
+// var searchRouter = require('./router/searchRouter')
+// var friendRouter = require('./router/friendRouter')
+const commonRouter = require('./router/commonRouter')
+const authRouter = require('./router/authRouter')
+const auth = require('./middleware/auth')
 
 var jwt = require('./dao/jwt')
 const app = express()
@@ -27,26 +31,29 @@ app.all('*', (req, res, next) => {
 // 解析前端数据
 app.use(bodyParser.json())
 
-// token判断
-app.use((req, res, next) => {
-  if(typeof(req.body.token) != 'undefined') {
-    let token = req.body.token
-    let tokenMatch = jwt.verifyToken(token)
-    if(tokenMatch == 1) {
-      next()
-    } else {
-      res.send({status: 401, msg: '登录失效'})
-    }
-  } else {
-    next()
-  }
-})
+// 获取cookie数据
+app.use(cookieParser())
 
-//app.get('/', (req, res) => res.send('你好'))
-app.use('/', indexRouter);
-app.use('/user', userRouter);
-app.use('/search', searchRouter);
-app.use('/friend', friendRouter);
+// token判断
+// app.use((req, res, next) => {
+//   console.log(req.cookies)
+//   console.log(req.cookies.token)
+//   if(typeof(req.cookies.token) != 'undefined') {
+//     let token = req.cookies.token
+//     //console.log(token)
+//     let tokenMatch = jwt.verifyToken(token)
+//     if(tokenMatch == 1) {
+//       next()
+//     } else {
+//       res.send({status: 401, msg: '登录失效'})
+//     }
+//   } else {
+//     next()
+//   }
+// })
+
+app.use('/api/auth', authRouter)
+app.use('/api/common', auth, commonRouter)
 
 app.use((req, res, next) => {
   let err = new Error('Not Found')

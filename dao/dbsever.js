@@ -93,8 +93,14 @@ exports.signInUser = function(data, pwd, res) {
             id: e._id,
             name: e.name,
             imgUrl: e.imgUrl,
-            token: token
           }
+          res.cookie('token', token, {
+            httpOnly: true,
+            secure: true,
+            // domain: 'localhost',
+            path: '/',
+            maxAge: 14*86400000,
+          })
           res.send({status: 200, data})
         }
       })
